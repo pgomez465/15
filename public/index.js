@@ -22,10 +22,14 @@ function onIceCandidate(evt) {
 }
 
 function onAddStream(evt) {
-    console.log('Got Stream from Remote Peer...');
-    let video  = document.getElementById('the-video');
-    video.srcObject = evt.stream;
-    video.play();
+    if(evt.stream) {
+        console.log('Got Stream from Remote Peer...');
+        let video  = document.getElementById('the-video');
+        video.srcObject = evt.stream;
+        video.play()
+            .then(() => console.log('Video Playback started...'))
+            .catch(() => console.log('Video Playback failed...'));
+    }
 }
 
 function gotOffer(description) {
@@ -92,10 +96,9 @@ function onAnswer(answer) {
     console.log('Set Remote Answer');
 }
 
-document.getElementById('login').addEventListener('click', () => {
-    socket.emit('signal', {login: true});
-});
-
+// Create Peer Connection
+createPeerConnection();
+    
 document.getElementById('start').addEventListener('click', () => {
     // 1. GetUserMedia
     navigator.getUserMedia(
@@ -112,12 +115,7 @@ document.getElementById('start').addEventListener('click', () => {
 
 // Handle remote Signals
 socket.on('signal', (msg) => {
-    console.log(`Received Signal ${msg}`);
-
-    if(msg.login) {
-        createPeerConnection();
-    }
-    else if(msg.candidate) {
+    if(msg.candidate) {
         onAddIceCandidate(msg.candidate);
     } else if(msg.offer) {
         onOffer(msg.offer);
