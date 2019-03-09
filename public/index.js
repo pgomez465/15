@@ -24,9 +24,9 @@ function onIceCandidate(evt) {
 function onAddStream(evt) {
     if(evt.stream) {
         console.log('Got Stream from Remote Peer...');
-        let video  = document.getElementById('the-video');
-        video.srcObject = evt.stream;
-        video.play()
+        let remoteVideo  = document.getElementById('remote-video');
+        remoteVideo.srcObject = evt.stream;
+        remoteVideo.play()
             .then(() => console.log('Video Playback started...'))
             .catch(() => console.log('Video Playback failed...'));
     }
@@ -49,6 +49,14 @@ function gotAnswer(description) {
 }
 
 function gotMediaStream(stream) {
+    // Add local video stream
+    console.log('Adding local video stream...');
+    let localVideo  = document.getElementById('local-video');
+    localVideo.srcObject = stream;
+    localVideo.play()
+        .then(() => console.log('Video Playback started...'))
+        .catch(() => console.log('Video Playback failed...'));
+
     // Add the stream to the PC
     pc.addStream(stream);
     console.log('Added Stream to PC');
@@ -99,7 +107,7 @@ function onAnswer(answer) {
 // Create Peer Connection
 createPeerConnection();
     
-document.getElementById('start').addEventListener('click', () => {
+document.getElementById('call').addEventListener('click', () => {
     // 1. GetUserMedia
     navigator.getUserMedia(
         //Constraints
@@ -111,6 +119,11 @@ document.getElementById('start').addEventListener('click', () => {
         // Error Callback
         onError
 );
+});
+
+document.getElementById('hangup').addEventListener('click', () => {
+    let remoteVideo  = document.getElementById('remote-video');
+    remoteVideo.src = null;
 });
 
 // Handle remote Signals
