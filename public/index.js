@@ -117,7 +117,7 @@ function onAnswer(answer) {
 
 document.getElementById('join').addEventListener('click', () => {
     // Create Peer Connection
-    createPeerConnection();
+    socket.emit('signal', {connectpeer: true});
 });
 
 document.getElementById('call').addEventListener('click', () => {
@@ -141,7 +141,9 @@ document.getElementById('hangup').addEventListener('click', () => {
 
 // Handle remote Signals
 socket.on('signal', (msg) => {
-    if(msg.candidate) {
+    if(msg.connectpeer) {
+        createPeerConnection();
+    } else if(msg.candidate) {
         onAddIceCandidate(msg.candidate);
     } else if(msg.offer) {
         onOffer(msg.offer);
