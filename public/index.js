@@ -26,26 +26,29 @@ function onAddStream(evt) {
         console.log('Got Stream from Remote Peer...');
         let remoteVideo  = document.getElementById('remote-video');
         remoteVideo.srcObject = evt.stream;
-        remoteVideo.play()
+
+        remoteVideo.onloadedmetadata = function(e) {
+            remoteVideo.play()
             .then(() => console.log('Video Playback started...'))
             .catch(() => console.log('Video Playback failed...'));
+        };
     }
 }
 
 function gotOffer(description) {
     console.log("Offer SDP created");
-    pc.setLocalDescription(description);
-
-    // Signal SDP to remote peer
-    socket.emit('signal', {offer: description});
+    pc.setLocalDescription(description, () => {
+        // Signal SDP to remote peer
+        socket.emit('signal', {offer: description});
+    });
 }
 
 function gotAnswer(description) {
     console.log("Anser SDP created");
-    pc.setLocalDescription(description);
-
-    // Signal SDP to remote peer
-    socket.emit('signal', {answer: description});
+    pc.setLocalDescription(description, () => {
+        // Signal SDP to remote peer
+        socket.emit('signal', {answer: description});
+    });
 }
 
 function gotMediaStream(stream) {
@@ -53,12 +56,18 @@ function gotMediaStream(stream) {
     console.log('Adding local video stream...');
     let localVideo  = document.getElementById('local-video');
     localVideo.srcObject = stream;
-    localVideo.play()
-        .then(() => console.log('Video Playback started...'))
-        .catch(() => console.log('Video Playback failed...'));
+    localVideo.onloadedmetadata = function(e) {
+        localVideo.play()
+        .then(() => console.log('Local Video Playback started...'))
+        .catch(() => console.log('Local Video Playback failed...'));
+    };
 
     // Add the stream to the PC
-    pc.addStream(stream);
+    // pc.addStream(stream);
+    // Add tracks to PC
+    stream.getTracks().forEach(function(track) {
+        pc.addTrack(track, stream);
+    });
     console.log('Added Stream to PC');
 
     console.log('Sending Offer');
@@ -70,7 +79,7 @@ function createPeerConnection() {
         //Creating RTC Peer Connection
 
         let conf = { 
-            "iceServers": [{ "url": "stun:stun.1.google.com:19302" }] 
+            "iceServers": [{ "urls": "stun:stun.1.google.com:19302" }] 
         };
 
         pc = new RTCPeerConnection(conf);
@@ -91,17 +100,19 @@ function onAddIceCandidate(candidate) {
 }
 
 function onOffer(offer) {
-    pc.setRemoteDescription(new RTCSessionDescription(offer));
-    console.log('Set Remote Offer');
+    pc.setRemoteDescription(new RTCSessionDescription(offer), () => {
+        console.log('Set Remote Offer');
 
-    console.log('Sending Answer');
-    // Create SDP Answer 
-    pc.createAnswer(gotAnswer, onError);
+        console.log('Sending Answer');
+        // Create SDP Answer 
+        pc.createAnswer(gotAnswer, onError);
+    });
 }
 
 function onAnswer(answer) {
-    pc.setRemoteDescription(new RTCSessionDescription(answer));
-    console.log('Set Remote Answer');
+    pc.setRemoteDescription(new RTCSessionDescription(answer), () => {
+        console.log('Set Remote Answer');
+    });
 }
 
 // Create Peer Connection
