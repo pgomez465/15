@@ -26,12 +26,17 @@ function onAddStream(evt) {
         console.log('Got Stream from Remote Peer...');
         let remoteVideo  = document.getElementById('remote-video');
         remoteVideo.srcObject = evt.stream;
+        remoteVideo.play()
+            .then(() => console.log('Video Playback started...'))
+            .catch(() => console.log('Video Playback failed...'));
 
+/*
         remoteVideo.onloadedmetadata = function(e) {
             remoteVideo.play()
             .then(() => console.log('Video Playback started...'))
             .catch(() => console.log('Video Playback failed...'));
         };
+*/
     }
 }
 
@@ -53,6 +58,7 @@ function gotAnswer(description) {
 
 function gotMediaStream(stream) {
     // Add local video stream
+/*
     console.log('Adding local video stream...');
     let localVideo  = document.getElementById('local-video');
     localVideo.srcObject = stream;
@@ -61,7 +67,7 @@ function gotMediaStream(stream) {
         .then(() => console.log('Local Video Playback started...'))
         .catch(() => console.log('Local Video Playback failed...'));
     };
-
+*/
     // Add the stream to the PC
     // pc.addStream(stream);
     // Add tracks to PC
