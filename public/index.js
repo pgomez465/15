@@ -29,14 +29,6 @@ function onAddStream(evt) {
         remoteVideo.play()
             .then(() => console.log('Video Playback started...'))
             .catch(() => console.log('Video Playback failed...'));
-
-/*
-        remoteVideo.onloadedmetadata = function(e) {
-            remoteVideo.play()
-            .then(() => console.log('Video Playback started...'))
-            .catch(() => console.log('Video Playback failed...'));
-        };
-*/
     }
 }
 
@@ -62,18 +54,12 @@ function gotMediaStream(stream) {
     console.log('Adding local video stream...');
     let localVideo  = document.getElementById('local-video');
     localVideo.srcObject = stream;
-    localVideo.onloadedmetadata = function(e) {
-        localVideo.play()
+    localVideo.play()
         .then(() => console.log('Local Video Playback started...'))
         .catch(() => console.log('Local Video Playback failed...'));
-    };
 */
     // Add the stream to the PC
-    // pc.addStream(stream);
-    // Add tracks to PC
-    stream.getTracks().forEach(function(track) {
-        pc.addTrack(track, stream);
-    });
+    pc.addStream(stream);
     console.log('Added Stream to PC');
 
     console.log('Sending Offer');
@@ -121,10 +107,7 @@ function onAnswer(answer) {
     });
 }
 
-document.getElementById('join').addEventListener('click', () => {
-    // Create Peer Connection
-    socket.emit('signal', {connectpeer: true});
-});
+createPeerConnection();
 
 document.getElementById('call').addEventListener('click', () => {
     // 1. GetUserMedia
@@ -147,9 +130,7 @@ document.getElementById('hangup').addEventListener('click', () => {
 
 // Handle remote Signals
 socket.on('signal', (msg) => {
-    if(msg.connectpeer) {
-        createPeerConnection();
-    } else if(msg.candidate) {
+    if(msg.candidate) {
         onAddIceCandidate(msg.candidate);
     } else if(msg.offer) {
         onOffer(msg.offer);
