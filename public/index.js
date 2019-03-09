@@ -26,9 +26,9 @@ function onAddStream(evt) {
         console.log('Got Stream from Remote Peer...');
         let remoteVideo  = document.getElementById('remote-video');
         remoteVideo.srcObject = evt.stream;
-        remoteVideo.play()
-            .then(() => console.log('Video Playback started...'))
-            .catch(() => console.log('Video Playback failed...'));
+        // remoteVideo.play()
+        //     .then(() => console.log('Video Playback started...'))
+        //     .catch(() => console.log('Video Playback failed...'));
     }
 }
 
@@ -50,14 +50,14 @@ function gotAnswer(description) {
 
 function gotMediaStream(stream) {
     // Add local video stream
-/*
+
     console.log('Adding local video stream...');
     let localVideo  = document.getElementById('local-video');
     localVideo.srcObject = stream;
-    localVideo.play()
-        .then(() => console.log('Local Video Playback started...'))
-        .catch(() => console.log('Local Video Playback failed...'));
-*/
+    // localVideo.play()
+    //     .then(() => console.log('Local Video Playback started...'))
+    //     .catch(() => console.log('Local Video Playback failed...'));
+
     // Add the stream to the PC
     pc.addStream(stream);
     console.log('Added Stream to PC');
@@ -109,11 +109,42 @@ function onAnswer(answer) {
 
 createPeerConnection();
 
+//constraints for desktop browser 
+var desktopConstraints = { 
+    video: { 
+        mandatory: { 
+            maxWidth:800,
+            maxHeight:600   
+        }  
+    }, 
+        
+    audio: false 
+}; 
+
+//constraints for mobile browser 
+var mobileConstraints = { 
+    video: { 
+        mandatory: { 
+            maxWidth: 480, 
+            maxHeight: 320, 
+        } 
+    }, 
+        
+    audio: false 
+}
+var constraints;
+//if a user is using a mobile browser 
+if(/Android|iPhone|iPad/i.test(navigator.userAgent)) { 
+    constraints = mobileConstraints;   
+} else { 
+    constraints = desktopConstraints; 
+}
 document.getElementById('call').addEventListener('click', () => {
+    
     // 1. GetUserMedia
     navigator.getUserMedia(
         //Constraints
-        {video: true, audio: false},
+        constraints,
 
         // Success Callback
         gotMediaStream,
