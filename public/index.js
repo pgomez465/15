@@ -115,9 +115,11 @@ function onAnswer(answer) {
     });
 }
 
-// Create Peer Connection
-createPeerConnection();
-    
+document.getElementById('join').addEventListener('click', () => {
+    // Create Peer Connection
+    createPeerConnection();
+});
+
 document.getElementById('call').addEventListener('click', () => {
     // 1. GetUserMedia
     navigator.getUserMedia(
