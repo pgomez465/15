@@ -53,6 +53,7 @@ function gotMediaStream(stream) {
 
     console.log('Adding local video stream...');
     let localVideo  = document.getElementById('local-video');
+    localVideo.autoplay = true;
     localVideo.srcObject = stream;
     // localVideo.play()
     //     .then(() => console.log('Local Video Playback started...'))
@@ -156,6 +157,7 @@ document.getElementById('call').addEventListener('click', () => {
 
 document.getElementById('hangup').addEventListener('click', () => {
     let remoteVideo  = document.getElementById('remote-video');
+    remoteVideo.autoplay = false;
     remoteVideo.src = null;
 });
 
